@@ -310,31 +310,6 @@ Wazuh captures the failed login attempts and fires Rule 5760. The alert is forwa
  
 A suspicious file dropped on the Windows agent is detected by Wazuh FIM (syscheck). The SHA256 hash is extracted and sent to VirusTotal. The EICAR test hash used below returns **65+ detections** across antivirus engines.
  
-```powershell
-# Simulate FIM alert from Windows 11 PowerShell
-$WEBHOOK = "https://YOUR-N8N-URL/webhook/wazuh-alerts"
- 
-$body = '{
-  "rule": {
-    "level": 12,
-    "description": "File added to the system.",
-    "groups": ["syscheck", "syscheck_entry_added"],
-    "id": "554"
-  },
-  "agent": { "id": "001", "name": "windows-11" },
-  "manager": { "name": "wazuh-manager" },
-  "syscheck": {
-    "path": "C:\\Users\\Public\\Downloads\\payload.exe",
-    "sha256_after": "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
-    "sha256_before": "",
-    "event": "added"
-  },
-  "full_log": "New file payload.exe detected with suspicious hash."
-}'
- 
-Invoke-RestMethod -Uri $WEBHOOK -Method POST -ContentType "application/json" -Body $body
-```
- 
 <img src="Images/20 Malicious File Creation Detected FIM.png" width="700"/>
 ---
  
@@ -391,55 +366,7 @@ The Wazuh event details section for FIM alerts: Rule ID, rule description, rule 
 - Gmail account with OAuth2 credentials configured in n8n
 - Google Sheets with two tabs: `Sheet1` (IP alerts) and `FIM_Alerts`
 - All five API keys: Groq, AbuseIPDB, URLScan.io, VirusTotal, Shodan (optional)
-### 1 — Clone & Import
- 
-```bash
-git clone https://github.com/User-Umar-Ahamed/soc-automation-pipeline.git
-cd soc-automation-pipeline
-```
- 
-In n8n: **Workflows → Import from File → select `workflow.json`**
- 
-### 2 — Configure Credentials in n8n
- 
-```
-Gmail OAuth2        → Settings → Credentials → Add
-Google Sheets OAuth2 → Settings → Credentials → Add
-```
- 
-### 3 — Add API Keys to Nodes
- 
-| Node | Field | Value |
-|------|-------|-------|
-| AbuseIPDB | Header: `Key` | Your AbuseIPDB API key |
-| URLScan | Header: `API-Key` | Your URLScan.io API key |
-| VirusTotal | Query: `apikey` | Your VirusTotal API key |
-| Groq Branch1 & 2 | Header: `Authorization` | `Bearer YOUR_GROQ_KEY` |
- 
-### 4 — Connect Wazuh Manager
- 
-```bash
-sudo nano /var/ossec/etc/ossec.conf
-# Add the <integration> block from Step 15
-sudo systemctl restart wazuh-manager
-```
- 
-### 5 — Test the Pipeline
- 
-```powershell
-# Windows PowerShell — Branch 1 (IP Threat)
-$WEBHOOK = "https://YOUR-N8N-URL/webhook/wazuh-alerts"
- 
-$body = '{"timestamp":"2025-05-01T10:00:00.000+0000","rule":{"level":10,"description":"sshd: authentication failed","groups":["authentication_failed","sshd"],"id":"5760"},"agent":{"id":"001","name":"windows-11"},"manager":{"name":"wazuh-manager"},"data":{"srcip":"185.220.101.1","dstuser":"Administrator","srcport":"52341"},"full_log":"Failed password for Administrator from 185.220.101.1 port 52341 ssh2"}'
-Invoke-RestMethod -Uri $WEBHOOK -Method POST -ContentType "application/json" -Body $body
- 
-# Windows PowerShell — Branch 2 (FIM Alert)
-$body = '{"timestamp":"2025-05-01T10:05:00.000+0000","rule":{"level":12,"description":"File added to the system.","groups":["syscheck","syscheck_entry_added"],"id":"554"},"agent":{"id":"001","name":"windows-11"},"manager":{"name":"wazuh-manager"},"syscheck":{"path":"C:\\Users\\Public\\Downloads\\payload.exe","sha256_after":"275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f","sha256_before":"","event":"added"},"full_log":"New file payload.exe detected."}'
-Invoke-RestMethod -Uri $WEBHOOK -Method POST -ContentType "application/json" -Body $body
-```
- 
-**Expected response:** `{"status":"received","timestamp":"2025-05-01T..."}`
- 
+
 ---
  
 ## 📊 Alert Fields Reference
