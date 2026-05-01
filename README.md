@@ -11,11 +11,6 @@
 <p align="center">
   <b>A real-world SOAR pipeline that detects, enriches, triages, and alerts on security threats — fully automated using AI.</b>
 </p>
-<p align="center">
-  <a href="#-workflow-demonstration">🔍 View Demo</a> &nbsp;•&nbsp;
-  <a href="#-quick-start">⚡ Quick Start</a> &nbsp;•&nbsp;
-  <a href="#-testing--attack-simulation">🧪 Testing</a>
-</p>
 ---
  
 ## 📖 Table of Contents
@@ -449,6 +444,4 @@ This project demonstrates how **AI and automation can dramatically enhance SOC e
     <img src="https://img.shields.io/badge/GitHub-User--Umar--Ahamed-181717?style=for-the-badge&logo=github" />
   </a>
 </p>
----
- 
-<p align="center"><i>Built with ⚡ by Umar Ahmed — Kingston University</i></p>
+
